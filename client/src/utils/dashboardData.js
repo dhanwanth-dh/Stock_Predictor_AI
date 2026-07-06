@@ -1,3 +1,5 @@
+import { apiUrl, readApiError } from "./api";
+
 export const timeRanges = ["1D", "1W", "1M", "1Y", "5Y"];
 
 export const navItems = [
@@ -26,15 +28,27 @@ const RANGE_TO_TIMEFRAME = {
 };
 
 export async function fetchTickers() {
-  const res = await fetch("/api/tickers");
-  if (!res.ok) throw new Error("Failed to fetch tickers");
-  return res.json();
+  const url = apiUrl("/api/tickers");
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch tickers (${await readApiError(res)})`);
+    return res.json();
+  } catch (err) {
+    if (err.message.startsWith("Failed to fetch tickers")) throw err;
+    throw new Error(`Cannot reach API at ${url || "/api/tickers"}`);
+  }
 }
 
 export async function fetchStockData(ticker) {
-  const res = await fetch(`/api/stocks/${encodeURIComponent(ticker)}`);
-  if (!res.ok) throw new Error(`Failed to fetch data for ${ticker}`);
-  return res.json();
+  const url = apiUrl(`/api/stocks/${encodeURIComponent(ticker)}`);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch data for ${ticker} (${await readApiError(res)})`);
+    return res.json();
+  } catch (err) {
+    if (err.message.startsWith("Failed to fetch data")) throw err;
+    throw new Error(`Cannot reach API at ${url || `/api/stocks/${ticker}`}`);
+  }
 }
 
 function deriveSignal(changePercent) {

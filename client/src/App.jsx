@@ -5,6 +5,7 @@ import AIInsightCard from "./components/AIInsightCard";
 import ChatPanel from "./components/ChatPanel";
 import PortfolioPage from "./components/PortfolioPage";
 import { fetchStockData, fetchTickers, mapApiDataToDashboard, timeRanges } from "./utils/dashboardData";
+import { getApiHint } from "./utils/api";
 
 const TABS = [
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
@@ -170,7 +171,8 @@ export default function App() {
 
         {error && (
           <div className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
-            ⚠ {error} — make sure the backend is running on port 8000.
+            ⚠ {error}
+            <p className="mt-1 text-xs text-danger/80">{getApiHint()}</p>
           </div>
         )}
 

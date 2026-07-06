@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { apiUrl } from "../utils/api";
 
 // --- Local storage helpers ---
 const STORAGE_KEY = "stockai_portfolio";
@@ -54,7 +55,7 @@ function AddHoldingModal({ type, onAdd, onClose }) {
 
   // Load ticker list once
   useEffect(() => {
-    fetch("/api/tickers")
+    fetch(apiUrl("/api/tickers"))
       .then((r) => r.json())
       .then((d) => setTickerList(d.tickers || []))
       .catch(() => {});
@@ -70,7 +71,7 @@ function AddHoldingModal({ type, onAdd, onClose }) {
     setForm((p) => ({ ...p, ticker, name: ticker }));
     // Fetch live price and auto-fill avgBuy
     setFetchingPrice(true);
-    fetch(`/api/stocks/${encodeURIComponent(ticker)}`)
+    fetch(apiUrl(`/api/stocks/${encodeURIComponent(ticker)}`))
       .then((r) => r.json())
       .then((d) => {
         setForm((p) => ({
@@ -201,7 +202,7 @@ export default function PortfolioPage({ liveData: externalLiveData }) {
     const tickers = portfolio.holdings.map((h) => h.ticker);
     tickers.forEach((ticker) => {
       if (externalLiveData?.[ticker] || fetchedPrices[ticker]) return;
-      fetch(`/api/stocks/${encodeURIComponent(ticker)}`)
+      fetch(apiUrl(`/api/stocks/${encodeURIComponent(ticker)}`))
         .then((r) => r.json())
         .then((d) => {
           setFetchedPrices((prev) => ({
